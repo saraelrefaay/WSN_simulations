@@ -58,29 +58,33 @@ for i=1:1:n
     S(i).E=Eo;
     S(i).ENERGY=0;
     S(i).id = i;
+    S(i).ids={};
     
-    if(S(i).xd >=xc(1) && S(i).xd <xc(1,2) && S(i).yd >= yc(1) && S(i).yd < yc(2))
+    if(S(i).xd >0 && S(i).xd <xc(1,2) && S(i).yd >= 0 && S(i).yd < yc(2))
         blocks(1).nodes{end+1} = S(i);
-    elseif(S(i).xd >=xc(1) && S(i).xd <xc(1,2) && S(i).yd >= yc(2) && S(i).yd < yc(3))
+    elseif(S(i).xd >=0 && S(i).xd <xc(1,2) && S(i).yd >= yc(2) && S(i).yd < yc(3))
         blocks(2).nodes{end+1} = S(i);
-    elseif(S(i).xd >=xc(1) && S(i).xd <xc(1,2) && S(i).yd >= yc(3) && S(i).yd <= yc(4))
+    elseif(S(i).xd >=0 && S(i).xd <xc(1,2) && S(i).yd >= yc(3) && S(i).yd <= yc(4))
         blocks(3).nodes{end+1} = S(i);
-    elseif(S(i).xd >=xc(1,2) && S(i).xd <xc(1,3) && S(i).yd >= yc(1) && S(i).yd < yc(2))
+    elseif(S(i).xd >=xc(1,2) && S(i).xd <xc(1,3) && S(i).yd >= 0 && S(i).yd < yc(2))
         blocks(4).nodes{end+1} = S(i);
     elseif(S(i).xd >=xc(1,2) && S(i).xd <xc(1,3) && S(i).yd >= yc(2) && S(i).yd < yc(3))
         blocks(5).nodes{end+1} = S(i);
     elseif(S(i).xd >=xc(1,2) && S(i).xd <xc(1,3) && S(i).yd >= yc(3) && S(i).yd <= yc(4))
         blocks(6).nodes{end+1} = S(i);
-    elseif(S(i).xd >=xc(1,3) && S(i).xd <=xc(1,4) && S(i).yd >= yc(1) && S(i).yd < yc(2))
+    elseif(S(i).xd >=xc(1,3) && S(i).xd <=xc(1,4) && S(i).yd >= 0 && S(i).yd < yc(2))
         blocks(7).nodes{end+1}= S(i);
     elseif(S(i).xd >=xc(1,3) && S(i).xd <=xc(1,4) && S(i).yd >= yc(2) && S(i).yd < yc(3))
         blocks(8).nodes{end+1} = S(i);
     elseif(S(i).xd >=xc(1,3) && S(i).xd <=xc(1,4) && S(i).yd >= yc(3) && S(i).yd <= yc(4))
         blocks(9).nodes{end+1} = S(i);
+    else
+        S(i)
     end
         
     % hold on;
 end
+
 for m=1:length(blocks)
     dist=[];
     for i=1:length(blocks(m).nodes)
@@ -93,23 +97,41 @@ for m=1:length(blocks)
         end
         dist(i)=totaldistance;
     end
-    dist
     [row,col] = find(dist == min(dist));
     blocks(m).head= blocks(m).nodes{col};
-
+    blocks(m).head;
+    blocks(m).head.type = 'C';
+    blocks(m).nodes{col}.type = 'C';
 end
 
-
+outliers = [];
 for m=1:length(blocks)
-    if(length(blocks(m).nodes) > max_cluster_nodes)
-       m
+    bl= length(blocks(m).nodes);
+    if(length(blocks(m).nodes) > max_cluster_nodes-1)
+        dist=[];
+       for n=1:length(blocks(m).nodes)
+           if(blocks(m).nodes{n}.type == 'N')
+            dist(end+1) = ecludian_distance(blocks(m).head.xd, blocks(m).nodes{n}.xd, blocks(m).head.yd, blocks(m).nodes{n}.yd);
+           end          
+       end
+       [dist, sorted_index] = sort(dist);
+       sub_index = sorted_index(1:max_cluster_nodes-1);       
+       outliers = [outliers sorted_index(max_cluster_nodes:end)];
+       out = length(outliers);
+       for v=1:(max_cluster_nodes-1)
+          blocks(m).head.ids{end+1} = S(sub_index(v));
+       end
     else
-        blocks(m).head.type = 'C';
-        blocks(m).head.ids = blocks(m).nodes;
+        for v=1:length(blocks(m).nodes)
+            if(blocks(m).nodes{v}.type == 'N')
+                blocks(m).head.ids{end+1} = blocks(m).nodes{v};
+            end
+        end
     end
-    blocks(m).head
+    head_ids= length(blocks(m).head.ids)
+    
 end
-
+length(outliers)
 
 % for k=2:length(dist)
 %     if (dist(k)<shortest)

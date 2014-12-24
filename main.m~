@@ -105,12 +105,10 @@ for round=1:max_rounds
     blocks_count = length(blocks);
     m=1;
     while m<=blocks_count
-        fprintf('blocks %d,%d\n',blocks_count, m);
          nodes_count = length(blocks(m).nodes);
          i=1;
          while i <=nodes_count
 %          for i=1:nodes_count
-            fprintf('working with %d,%d\n',nodes_count, i);
             for j=1:nodes_count
                 if(i~=j)
 %                     fprintf('working with %d,%d\n',nodes_count, i);
@@ -130,14 +128,13 @@ for round=1:max_rounds
                 blocks(m).nodes= blocks(m).nodes(~cellfun('isempty',blocks(m).nodes));
                 nodes_count= nodes_count -1;
                 i = i-1;
-%                 if(i <= 0)
-%                     i=1;
-%                 end
+                if(i <= 0)
+                    i=1;
+                end
             else
                 blocks(m).nodes{i}.g = blocks(m).nodes{i}.E + blocks(m).nodes{i}.nearest - blocks(m).nodes{i}.integrity;
 %                 grade(i) = blocks(m).nodes{i}.g;
             end
-            i=i+1;
          end
          grade = [];
          if length(blocks(m).nodes) > 0
@@ -149,26 +146,24 @@ for round=1:max_rounds
             blocks(m).nodes{grade_index}.type = 'C';
             blocks(m).head = blocks(m).nodes{grade_index};
          else
-             fprintf('empty block deleting %d, %d\n',blocks_count, m);
              blocks(m) = [];
 %              blocks= blocks(~cellfun('isempty',blocks));
              blocks_count = blocks_count - 1;
              m=m-1;
-%              if(m<= 0)
-%                  m=1;
-%              end             
+             if(m<= 0)
+                 m=1;
+             end             
          end
-         m = m+1;
+ 
         %     [row,col] = find(dist == min(dist));
         %     blocks(m).head= blocks(m).nodes{col};
         %     blocks(m).head;
         %     blocks(m).head.type = 'C';
         %     blocks(m).nodes{col}.type = 'C';
     end
-    fprintf('length of block %d\n',length(blocks));
-    
+    length(blocks)
     for m=1:length(blocks)
-        fprintf('head %d\n',blocks(m).head.id);
+        blocks(m).head.id
         if(isempty(find(random_nodes == blocks(m).head.id)) == 0)
             blocks(m).head.id
             failed_heads = failed_heads+1;

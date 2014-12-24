@@ -111,18 +111,18 @@ for round=1:max_rounds
          while i <=nodes_count
 %          for i=1:nodes_count
             fprintf('working with %d,%d\n',nodes_count, i);
-            for j=1:nodes_count
-                if(i~=j)
-%                     fprintf('working with %d,%d\n',nodes_count, i);
-                    distance = ecludian_distance(blocks(m).nodes{i}.xd, blocks(m).nodes{j}.xd, blocks(m).nodes{i}.yd, blocks(m).nodes{j}.yd);
-                    if(distance <= 10)
-                        blocks(m).nodes{i}.nearest= blocks(m).nodes{i}.nearest+ 1;
-                    end
-                end
-            end
-            if(~isempty(find(random_nodes == blocks(m).nodes{i}.id)))
-                blocks(m).nodes{i}.integrity = blocks(m).nodes{i}.integrity + 10;
-            end
+%             for j=1:nodes_count
+%                 if(i~=j)
+% %                     fprintf('working with %d,%d\n',nodes_count, i);
+%                     distance = ecludian_distance(blocks(m).nodes{i}.xd, blocks(m).nodes{j}.xd, blocks(m).nodes{i}.yd, blocks(m).nodes{j}.yd);
+%                     if(distance <= 10)
+%                         blocks(m).nodes{i}.nearest= blocks(m).nodes{i}.nearest+ 1;
+%                     end
+%                 end
+%             end
+%             if(~isempty(find(random_nodes == blocks(m).nodes{i}.id)))
+%                 blocks(m).nodes{i}.integrity = blocks(m).nodes{i}.integrity + 10;
+%             end
             blocks(m).nodes{i}.E = blocks(m).nodes{i}.E - 0.01;
             if(blocks(m).nodes{i}.E <= 0 )
                 fprintf('low energy deleting %d,%d\n',nodes_count, i);
@@ -133,21 +133,23 @@ for round=1:max_rounds
 %                 if(i <= 0)
 %                     i=1;
 %                 end
-            else
-                blocks(m).nodes{i}.g = blocks(m).nodes{i}.E + blocks(m).nodes{i}.nearest - blocks(m).nodes{i}.integrity;
+%             else
+%                  blocks(m).nodes{i}.g = blocks(m).nodes{i}.E + blocks(m).nodes{i}.nearest - blocks(m).nodes{i}.integrity;
 %                 grade(i) = blocks(m).nodes{i}.g;
             end
             i=i+1;
          end
-         grade = [];
+%          grade = [];
          if length(blocks(m).nodes) > 0
-            for i=1:length(blocks(m).nodes)
-                grade(i) = blocks(m).nodes{i}.g;
-            end
-            grade
-            [grade_max, grade_index] = max(grade);
-            blocks(m).nodes{grade_index}.type = 'C';
-            blocks(m).head = blocks(m).nodes{grade_index};
+             
+%             for i=1:length(blocks(m).nodes)
+%                 grade(i) = blocks(m).nodes{i}.g;
+%             end
+%             grade
+%             [grade_max, grade_index] = max(grade);
+%             blocks(m).nodes{grade_index}.type = 'C';
+            blocks(m).head = blocks(m).nodes{grade_index}
+%             blocks(m).nodes{grade_index};
          else
              fprintf('empty block deleting %d, %d\n',blocks_count, m);
              blocks(m) = [];

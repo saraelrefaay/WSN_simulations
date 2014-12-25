@@ -88,8 +88,8 @@ for i=1:1:n
         blocks(8).nodes{end+1} = S(i);
     elseif(S(i).xd >=xc(1,3) && S(i).xd <=xc(1,4) && S(i).yd >= yc(3) && S(i).yd <= yc(4))
         blocks(9).nodes{end+1} = S(i);
-    else
-        S(i)
+%     else
+%         S(i)
     end
         
     % hold on;

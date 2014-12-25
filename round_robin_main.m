@@ -47,6 +47,7 @@ max_rounds = 100;
 blocks =[];
 for x=1:9
     blocks(x).nodes = {} ;
+    blocks(x).queue = CQueue();
 end
 
 rng(5);
@@ -72,24 +73,33 @@ for i=1:1:n
     
     if(S(i).xd >0 && S(i).xd <xc(1,2) && S(i).yd >= 0 && S(i).yd < yc(2))
         blocks(1).nodes{end+1} = S(i);
+        blocks(1).queue.push(S(i));
     elseif(S(i).xd >=0 && S(i).xd <xc(1,2) && S(i).yd >= yc(2) && S(i).yd < yc(3))
         blocks(2).nodes{end+1} = S(i);
+        blocks(2).queue.push(S(i));
     elseif(S(i).xd >=0 && S(i).xd <xc(1,2) && S(i).yd >= yc(3) && S(i).yd <= yc(4))
         blocks(3).nodes{end+1} = S(i);
+        blocks(3).queue.push(S(i));
     elseif(S(i).xd >=xc(1,2) && S(i).xd <xc(1,3) && S(i).yd >= 0 && S(i).yd < yc(2))
         blocks(4).nodes{end+1} = S(i);
+        blocks(4).queue.push(S(i));
     elseif(S(i).xd >=xc(1,2) && S(i).xd <xc(1,3) && S(i).yd >= yc(2) && S(i).yd < yc(3))
         blocks(5).nodes{end+1} = S(i);
+        blocks(5).queue.push(S(i));
     elseif(S(i).xd >=xc(1,2) && S(i).xd <xc(1,3) && S(i).yd >= yc(3) && S(i).yd <= yc(4))
         blocks(6).nodes{end+1} = S(i);
+        blocks(6).queue.push(S(i));
     elseif(S(i).xd >=xc(1,3) && S(i).xd <=xc(1,4) && S(i).yd >= 0 && S(i).yd < yc(2))
         blocks(7).nodes{end+1}= S(i);
+        blocks(7).queue.push(S(i));
     elseif(S(i).xd >=xc(1,3) && S(i).xd <=xc(1,4) && S(i).yd >= yc(2) && S(i).yd < yc(3))
         blocks(8).nodes{end+1} = S(i);
+        blocks(8).queue.push(S(i));
     elseif(S(i).xd >=xc(1,3) && S(i).xd <=xc(1,4) && S(i).yd >= yc(3) && S(i).yd <= yc(4))
         blocks(9).nodes{end+1} = S(i);
-    else
-        S(i)
+        blocks(9).queue.push(S(i));
+%     else
+%         S(i)
     end
         
     % hold on;
@@ -110,7 +120,7 @@ for round=1:max_rounds
          i=1;
          while i <=nodes_count
 %          for i=1:nodes_count
-            fprintf('working with %d,%d\n',nodes_count, i);
+%             fprintf('working with %d,%d\n',nodes_count, i);
 %             for j=1:nodes_count
 %                 if(i~=j)
 % %                     fprintf('working with %d,%d\n',nodes_count, i);
@@ -139,8 +149,23 @@ for round=1:max_rounds
             end
             i=i+1;
          end
+         
 %          grade = [];
          if length(blocks(m).nodes) > 0
+             ids=[];
+             for x=1:length(blocks(m).nodes)
+                ids(end+1) = blocks(m).nodes{x}.id;
+             end
+             
+             if(~blocks(m).queue.isempty())
+                head = blocks(m).queue.pop();
+             end
+%              blocks(m).queue.push(head)
+                
+             while isempty(find(ids == head.id)) && ~blocks(m).queue.isempty()
+                 head = blocks(m).queue.pop();
+             end
+             
              
 %             for i=1:length(blocks(m).nodes)
 %                 grade(i) = blocks(m).nodes{i}.g;
@@ -148,7 +173,16 @@ for round=1:max_rounds
 %             grade
 %             [grade_max, grade_index] = max(grade);
 %             blocks(m).nodes{grade_index}.type = 'C';
-            blocks(m).head = blocks(m).nodes{grade_index}
+%             for i=1:length(blocks(m).nodes)
+%                 if(blocks(m).nodes{i}.id)
+                    if(~isempty(head))
+                        fprintf('new head is %d\n',head.id);
+                        blocks(m).head = head;
+                        blocks(m).queue.push(head);
+                    end
+%                     head_ids
+%                 end
+%             end
 %             blocks(m).nodes{grade_index};
          else
              fprintf('empty block deleting %d, %d\n',blocks_count, m);
@@ -167,12 +201,11 @@ for round=1:max_rounds
         %     blocks(m).head.type = 'C';
         %     blocks(m).nodes{col}.type = 'C';
     end
-    fprintf('length of block %d\n',length(blocks));
+%     fprintf('length of block %d\n',length(blocks));
     
     for m=1:length(blocks)
         fprintf('head %d\n',blocks(m).head.id);
-        if(isempty(find(random_nodes == blocks(m).head.id)) == 0)
-            blocks(m).head.id
+        if(~isempty(find(random_nodes == blocks(m).head.id)))
             failed_heads = failed_heads+1;
         end
     end
